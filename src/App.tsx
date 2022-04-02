@@ -1,43 +1,35 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import logo from './logo.svg'
 import './App.css'
+import { productType } from './types/productTypes'
+import { Route, Routes } from 'react-router-dom'
+import Home from './pages/Home'
+import axios from 'axios'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [counts, setCount] = useState<productType[]>([])
+
+  useEffect (() =>{
+    const getProduct = async()=>{
+      const {data} =await axios.get(' http://localhost:3001/posts');
+      setCount(data);
+    } 
+    getProduct()
+  },[])
+
+  const startRemove= (id:number)=>{
+     axios.delete(("http://localhost:3001/posts/"+id))
+     //onclick xóa luôn
+     setCount(counts.filter(item=>item.id!==id))  ///nếu item lặp ra 1 item mới ko bao gồm id click vào thì sẽ sét luôn 
+  }
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
+    <div >
+      <Routes> 
+        <Route path="/" element={<Home counts={counts} onRemove={startRemove}/>}   /> 
+      </Routes>
+
+   
     </div>
   )
 }
